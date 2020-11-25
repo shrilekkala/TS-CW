@@ -1,7 +1,7 @@
 """
 """
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 
 """
@@ -47,3 +47,8 @@ def AR2_sim(phis, sigma2, N):
     
     # return the vector X C with the 1st 100 values discarded
     return X[100:]
+
+# plotting an example sim for AR(2)
+plt.plot(AR2_sim((0.1, 0.1), 1, 50))
+plt.xlabel('t')
+plt.ylabel(r'$X_t$', rotation = 0)
