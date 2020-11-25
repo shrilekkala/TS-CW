@@ -30,3 +30,20 @@ def S_AR(f, phis, sigma2):
     S = sigma2 / np.abs(V @ x)
     
     return S
+
+"b"
+
+def AR2_sim(phis, sigma2, N):
+    # create a vector to store Xt
+    X = np.ones(100+N)
+    
+    # set the intial values
+    X[0] = 0
+    X[1] = 0
+    
+    # iteratively find the values of the time series
+    for i in range(2, 100+N):
+        X[i] = phis[0] * X[i-1] + phis[1] * X[i-2] + np.random.normal(0, np.sqrt(sigma2))
+    
+    # return the vector X C with the 1st 100 values discarded
+    return X[100:]
