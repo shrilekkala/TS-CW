@@ -52,3 +52,21 @@ def AR2_sim(phis, sigma2, N):
 plt.plot(AR2_sim((0.1, 0.1), 1, 50))
 plt.xlabel('t')
 plt.ylabel(r'$X_t$', rotation = 0)
+
+"c"
+
+def acvs_hat(X, tau):
+    N = len(X)
+    
+    # initialise s_hat
+    s_hat = np.zeros(len(tau))
+    
+    for i in range(len(tau)):
+        # define k = the absolute value of the element of tau
+        k = np.abs(tau[i])
+        
+        # compute the dot product between the first N - k elements of X
+        # and the first N - k elements of X shifted by k, and divide by N
+        s_hat[i] = (X[: N - k].T @ X[k :]) / N
+    
+    return s_hat
