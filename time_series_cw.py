@@ -2,7 +2,7 @@
 """
 import numpy as np
 import matplotlib.pyplot as plt
-
+import scipy
 
 """
 Question 1
@@ -76,8 +76,22 @@ def acvs_hat(X, tau):
 # check part c
 AR1 = AR2_sim((0.8, 0), 1, 500)
 tot = np.zeros(3)
-for i in range(1000):
+for i in range(200):
     tot += acvs_hat(AR2_sim((0.8, 0), 1, 500), np.array([0,1,2]))
 avg = tot / 1000
 print(avg)
 #print(acvs_hat(AR2_sim((0.8, 0), 1, 5000), np.array([0,1,2])))
+
+
+"""
+Question 2
+"""
+"a"
+
+def periodogram(X):
+    N = len(X)
+    
+    # compute the periodogram Sp using the fft algorithm
+    Sp = (np.abs(scipy.fft.fft(X)) ** 2) / N
+    
+    return Sp
