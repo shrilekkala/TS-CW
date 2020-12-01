@@ -95,3 +95,22 @@ def periodogram(X):
     Sp = (np.abs(scipy.fft.fft(X)) ** 2) / N
     
     return Sp
+
+def direct(X):
+    N = len(X)
+    
+    # construct the taper h_t
+    h = np.arange(1, N+1)
+    h = 0.5 * np.sqrt(8 / (3 * (N + 1))) * (1 - np.cos(h * 2 * np.pi/(N+1)))
+    
+    # compute the direct spectral estimate Sd using the fft algorithm
+    Sd = np.abs(scipy.fft.fft(h * X)) ** 2
+    
+    return Sd
+    
+    
+    
+    
+    
+    
+    
