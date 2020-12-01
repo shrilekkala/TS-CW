@@ -49,9 +49,11 @@ def AR2_sim(phis, sigma2, N):
     return X[100:]
 
 # plotting an example sim for AR(2)
-plt.plot(AR2_sim((0.5, 0.5), 1, 50))
+plt.plot(AR2_sim((0.8, 0), 1, 50))
 plt.xlabel('t')
 plt.ylabel(r'$X_t$', rotation = 0)
+
+
 
 "c"
 
@@ -70,3 +72,12 @@ def acvs_hat(X, tau):
         s_hat[i] = (X[: N - k].T @ X[k :]) / N
     
     return s_hat
+
+# check part c
+AR1 = AR2_sim((0.8, 0), 1, 500)
+tot = np.zeros(3)
+for i in range(1000):
+    tot += acvs_hat(AR2_sim((0.8, 0), 1, 500), np.array([0,1,2]))
+avg = tot / 1000
+print(avg)
+#print(acvs_hat(AR2_sim((0.8, 0), 1, 5000), np.array([0,1,2])))
