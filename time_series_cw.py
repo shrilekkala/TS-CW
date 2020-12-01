@@ -9,25 +9,25 @@ Question 1
 """
 "a"
 
+
 def S_AR(f, phis, sigma2):
     
     # set value of p from phis
     p = len(phis)
     
-    # # generate the vector (1, -e^(-i*2*pi*f), ..., -e^(-i*2*pi*f*p))
-    # v1 = np.ones(p+1, dtype = 'complex') * np.exp(--1j * 2 * np.pi)
+    # initialise S
+    S = f.copy()
+
     
-    # create input vector required to construct the vandermonde matrix
-    vec = np.exp(--1j * 2 * np.pi) ** f
+    # create vectors phis1 = ([1, -phi_1p, -phi_2p, .., -phi_pp])
+    phis1 = np.ones(p + 1)
+    phis1[1:] = - phis
     
-    # create the Vandermonde matrix  V and the vector x
-    V = np.vander(vec, p+1)
-    
-    x = np.ones(p+1)
-    x[1:] = - phis
-    
-    # evaluate S using the parametric form of the sdf
-    S = sigma2 / np.abs(V @ x)
+    for i in range(len(f)):
+        # generate the vector (1, e^(-i*2*pi*f), ..., -^(-i*2*pi*f*p))
+        v1 = np.ones(p+1, dtype = 'complex') * np.exp(-1j * 2 * np.pi * f[i] * np.arange(p+1))
+        
+        S[i] = sigma2 / (np.abs(phis1.T @ v1) ** 2)
     
     return S
 
@@ -49,7 +49,7 @@ def AR2_sim(phis, sigma2, N):
     return X[100:]
 
 # plotting an example sim for AR(2)
-plt.plot(AR2_sim((0.1, 0.1), 1, 50))
+plt.plot(AR2_sim((0.5, 0.5), 1, 50))
 plt.xlabel('t')
 plt.ylabel(r'$X_t$', rotation = 0)
 
