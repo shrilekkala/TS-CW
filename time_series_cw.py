@@ -134,6 +134,53 @@ true_s = 1 / ((1 - 2*0.95*np.cos(2*np.pi*(1/8 + freq)) + 0.95**2)*(1 - 2*0.95*np
 p_sample_mean = np.mean(p_mat, axis=0)
 d_sample_mean = np.mean(d_mat, axis=0)
 
-p_empirical_bias = p_sample_mean - true_s
-d_empirical_bias = d_sample_mean - true_s
+# compute the absolute value of the sample bias
+p_empirical_bias = np.abs(p_sample_mean - true_s)
+d_empirical_bias = np.abs(d_sample_mean - true_s)
+
+"b (C)"
+# store the parameters for the AR2
+phis1 = np.array([np.sqrt(2) * 0.95, - 0.95 ** 2])
+
+# create a function that goes through steps A) and B) for a specific N
+def spectral_estimators(N):
+    # create matrices to store the periodogram / direct spectral estimates
+    p_mat = np.ones((10000, 3))
+    d_mat = np.ones((10000, 3))
+    
+    for i in range(10000):
+        X = AR2_sim(phis1, 1, N)
+        
+        ####
+        ###FIX
+        ####
+        # the indices for 1/8, 2/8 and 3/8 from the fourier frequencies
+        indicies = np.arange(1,4) * (np.log(N) / np.log(2) - 2)
+        indicies = indicies.astype(int)
+        
+        # extract the values for frequencies 1/8, 2/8 and 3/8 and store in matrices
+        p_mat[i,:] = periodogram(X)[indicies]
+        d_mat[i,:] = direct(X)[indicies]
+    
+    # compute the absolute value of the sample bias
+    p_empirical_bias = np.abs(np.mean(p_mat, axis=0) - true_s)
+    d_empirical_bias = np.abs(np.mean(d_mat, axis=0) - true_s)
+    
+    return p_empirical_bias, d_empirical_bias
+
+# generate N values of powers of 2 from 16 to 4096
+N_vals = 2 ** np.arange(4,13)
+
+# create a 9 x 6 matrix to store the empirical bias for different frequencies and different estimators
+bias_matrix = np.zeros((9,6))
+
+for i in range(len(N_vals)):
+    ### just for output ###
+    print(i)
+    p_bias, d_bias = spectral_estimators(N_vals[i])
+    bias_matrix[i, 0:3] = p_bias
+    bias_matrix[i, 3:6] = d_bias
+
+
+
 
