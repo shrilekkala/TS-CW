@@ -108,9 +108,20 @@ def direct(X):
     
     return Sd
     
-    
-    
-    
+
+"b (A) "
+# store the parameters for the AR2
+phis1 = np.array([np.sqrt(2) * 0.95, - 0.95 ** 2])
+
+# create matrices to store the periodogram / direct spectral estimates
+p_mat = np.ones((10000, 3))
+d_mat = np.ones((10000, 3))
+
+for i in range(10000):
+    X = AR2_sim(phis1, 1, 16)
+    # extract the values for frequencies 1/8, 2/8 and 3/8 and store in matrices
+    p_mat[i,:] = periodogram(X)[[2, 4, 6]]
+    d_mat[i,:] = direct(X)[[2, 4, 6]]
     
     
     
