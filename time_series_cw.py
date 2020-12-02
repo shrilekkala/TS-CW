@@ -110,6 +110,7 @@ def direct(X):
     
 
 "b (A) "
+
 # store the parameters for the AR2
 phis1 = np.array([np.sqrt(2) * 0.95, - 0.95 ** 2])
 
@@ -122,6 +123,17 @@ for i in range(10000):
     # extract the values for frequencies 1/8, 2/8 and 3/8 and store in matrices
     p_mat[i,:] = periodogram(X)[[2, 4, 6]]
     d_mat[i,:] = direct(X)[[2, 4, 6]]
+
     
-    
-    
+"b (B) "
+# compute the true sdf at frequencies 1/8, 2/8 and 3/8
+freq = np.array([1/8, 2/8, 3/8])
+true_s = 1 / ((1 - 2*0.95*np.cos(2*np.pi*(1/8 + freq)) + 0.95**2)*(1 - 2*0.95*np.cos(2*np.pi*(1/8 - freq)) + 0.95**2))
+
+# compute the sample mean for the periodogram and the direct spectral estimator
+p_sample_mean = np.mean(p_mat, axis=0)
+d_sample_mean = np.mean(d_mat, axis=0)
+
+p_empirical_bias = p_sample_mean - true_s
+d_empirical_bias = d_sample_mean - true_s
+
