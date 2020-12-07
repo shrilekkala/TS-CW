@@ -190,23 +190,26 @@ print("time taken: ", end - start)
 "b (D)"
 # plot comparison for f = 1/8
 plt.title('f = 1/8')
-plt.plot(N_vals, bias_matrix[:,0], marker = '.')
-plt.plot(N_vals, bias_matrix[:,3], marker = '.', color = 'red')
+plt.plot(N_vals, bias_matrix[:,0], marker = '.', label = 'periodogram')
+plt.plot(N_vals, bias_matrix[:,3], marker = '.', color = 'red', label = 'direct')
 plt.xscale('log', basex = 2)
+plt.legend()
 plt.show()
 
 # plot comparison for f = 2/8
 plt.title('f = 2/8')
-plt.plot(N_vals, bias_matrix[:,1], marker = '.')
-plt.plot(N_vals, bias_matrix[:,4], marker = '.', color = 'red')
+plt.plot(N_vals, bias_matrix[:,1], marker = '.', label = 'periodogram')
+plt.plot(N_vals, bias_matrix[:,4], marker = '.', color = 'red', label = 'direct')
 plt.xscale('log', basex = 2)
+plt.legend()
 plt.show()
 
 # plot comparison for f = 3/8
 plt.title('f = 3/8')
-plt.plot(N_vals, bias_matrix[:,2], marker = '.')
-plt.plot(N_vals, bias_matrix[:,5], marker = '.', color = 'red')
+plt.plot(N_vals, bias_matrix[:,2], marker = '.', label = 'periodogram')
+plt.plot(N_vals, bias_matrix[:,5], marker = '.', color = 'red', label = 'direct')
 plt.xscale('log', basex = 2)
+plt.legend()
 plt.show()
 
 # plot true S (S(f) against f)
