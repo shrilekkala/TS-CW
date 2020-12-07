@@ -3,6 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy
+import time
 
 """
 Question 1
@@ -41,9 +42,12 @@ def AR2_sim(phis, sigma2, N):
     X[0] = 0
     X[1] = 0
     
+    # create vector of epsilons via Multivariate Normal Distribution
+    eps = np.random.normal(0, np.sqrt(sigma2), 100+N)
+    
     # iteratively find the values of the time series
     for i in range(2, 100+N):
-        X[i] = phis[0] * X[i-1] + phis[1] * X[i-2] + np.random.normal(0, np.sqrt(sigma2))
+        X[i] = phis[0] * X[i-1] + phis[1] * X[i-2] + eps[i]
     
     # return the vector X C with the 1st 100 values discarded
     return X[100:]
@@ -52,7 +56,7 @@ def AR2_sim(phis, sigma2, N):
 plt.plot(AR2_sim((0.8, 0), 1, 50))
 plt.xlabel('t')
 plt.ylabel(r'$X_t$', rotation = 0)
-
+plt.show()
 
 
 "c"
@@ -151,11 +155,8 @@ def spectral_estimators(N):
     for i in range(10000):
         X = AR2_sim(phis1, 1, N)
         
-        ####
-        ###FIX
-        ####
         # the indices for 1/8, 2/8 and 3/8 from the fourier frequencies
-        indicies = np.arange(1,4) * (np.log(N) / np.log(2) - 2)
+        indicies = np.arange(1,4) * (N / 8)
         indicies = indicies.astype(int)
         
         # extract the values for frequencies 1/8, 2/8 and 3/8 and store in matrices
@@ -174,6 +175,8 @@ N_vals = 2 ** np.arange(4,13)
 # create a 9 x 6 matrix to store the empirical bias for different frequencies and different estimators
 bias_matrix = np.zeros((9,6))
 
+start = time.time()
+
 for i in range(len(N_vals)):
     ### just for output ###
     print(i)
@@ -181,6 +184,34 @@ for i in range(len(N_vals)):
     bias_matrix[i, 0:3] = p_bias
     bias_matrix[i, 3:6] = d_bias
 
+end = time.time()
+print("time taken: ", end - start)
 
+"b (D)"
+# plot comparison for f = 1/8
+plt.title('f = 1/8')
+plt.plot(N_vals, bias_matrix[:,0], marker = '.')
+plt.plot(N_vals, bias_matrix[:,3], marker = '.', color = 'red')
+plt.xscale('log', basex = 2)
+plt.show()
 
+# plot comparison for f = 2/8
+plt.title('f = 2/8')
+plt.plot(N_vals, bias_matrix[:,1], marker = '.')
+plt.plot(N_vals, bias_matrix[:,4], marker = '.', color = 'red')
+plt.xscale('log', basex = 2)
+plt.show()
 
+# plot comparison for f = 3/8
+plt.title('f = 3/8')
+plt.plot(N_vals, bias_matrix[:,2], marker = '.')
+plt.plot(N_vals, bias_matrix[:,5], marker = '.', color = 'red')
+plt.xscale('log', basex = 2)
+plt.show()
+
+# plot true S (S(f) against f)
+frequencies = np.linspace(0, 1/2, 101)
+sdf = S_AR(frequencies, phis1, 1)
+plt.plot(frequencies, sdf)
+plt.axvline(x=1/8, color = 'r', ls = 'dotted', lw=1, label = 'f = 1/8')
+plt.show()
