@@ -249,7 +249,8 @@ plt.show()
 """
 def Yule_Walker(X, p):
     """
-    Function that fits an AR(p) model given data X and number of parameters p
+    Function that fits an AR(p) model  by the Yule-Walker method
+    given data X and number of parameters p
     and returns the estimates for the coefficients and sigma epsilon squared
     """
     N = len(X)
@@ -260,26 +261,45 @@ def Yule_Walker(X, p):
     s_hat = s_hat / N
     
     # create the gamma vector
-    gamma_v = s_hat[1:]
+    gamma_vec = s_hat[1:]
     
     # construct the GAMMA matrix by diagonals
-    GAMMA_M = np.zeros((p,p))
+    GAMMA_mat = np.zeros((p,p))
     for j in range(p):
         diag_index = np.arange(p-j)
-        GAMMA_M[diag_index, diag_index + j] = s_hat[j] * np.ones(p-j)
-        GAMMA_M[diag_index + j, diag_index] = s_hat[j] * np.ones(p-j)
+        GAMMA_mat[diag_index, diag_index + j] = s_hat[j] * np.ones(p-j)
+        GAMMA_mat[diag_index + j, diag_index] = s_hat[j] * np.ones(p-j)
         
     # find the vector estimate of the phis
-    phis_v = np.linalg.inv(GAMMA_M) @ gamma_v
+    phis_v = np.linalg.inv(GAMMA_mat) @ gamma_vec
     
     # find the estimate of sigma_epsilon squared
     sigma_eps = s_hat[0] - np.dot(phis_v, s_hat[1:])
         
     return phis_v, sigma_eps
 
+def Least_Squares(X, p):
+    """
+    Function that fits an AR(p) model by the Least Squares method
+    given data X and number of parameters p
+    and returns the estimates for the coefficients and sigma epsilon squared
+    """
+    N = len(X)
+    # create vector X_v
+    X_v = X[p:]
+    
+    # construct matrix F (column by column)
+    F = np.zeros((N - p, p))
+    for i in range(p):
+        F[:, i] = X[(p-1-i): (N-1-i)]
+        
+    # find the vector estimate of the phis
+    phis_v = np.linalg.inv(F.T @ F) @ F.T @ X_v
+    
+    # find the estimate of sigma_epsilon squared
+    sigma_eps = (X_v - F @ phis_v).T @(X_v - F @ phis_v) / (N - 2*p)
 
-
-
+    return phis_v, sigma_eps
 
         
     
