@@ -175,6 +175,7 @@ N_vals = 2 ** np.arange(4,13)
 # create a 9 x 6 matrix to store the empirical bias for different frequencies and different estimators
 bias_matrix = np.zeros((9,6))
 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
 start = time.time()
 
 for i in range(len(N_vals)):
@@ -218,7 +219,7 @@ sdf = S_AR(frequencies, phis1, 1)
 plt.plot(frequencies, sdf)
 plt.axvline(x=1/8, color = 'r', ls = 'dotted', lw=1, label = 'f = 1/8')
 plt.show()
-
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
 """
 Question 3
 """
@@ -256,7 +257,7 @@ def Yule_Walker(X, p):
     N = len(X)
     # create a vector estimate for the autocovariance sequence
     s_hat = np.zeros(p+1)
-    for i in range(p):
+    for i in range(p+1):
         s_hat[i] = np.dot(X[0: N-i], X[i: N])
     s_hat = s_hat / N
     
@@ -338,15 +339,15 @@ AIC = 2 * p_mat + N * np.log(sigma_mat)
 p_min = np.argmin(AIC, axis = 0) + 1
 
 # Find the parameter values for the chosen p for each method
-YW_phis, YW_sigma_eps = Yule_Walker(time_series, 5)
+YW_phis, YW_sigma_eps = Yule_Walker(time_series, p_min[0])
 YW_phis
 YW_sigma_eps
 
-LS_phis, LS_sigma_eps = Least_Squares(time_series, x)
+LS_phis, LS_sigma_eps = Least_Squares(time_series, p_min[1])
 LS_phis
 LS_sigma_eps
 
-ML_phis, ML_sigma_eps = Maximum_Likelihood(time_series, x)
+ML_phis, ML_sigma_eps = Maximum_Likelihood(time_series, p_min[2])
 ML_phis
 ML_sigma_eps
 
@@ -360,10 +361,12 @@ S_LS = S_AR(f, LS_phis, LS_sigma_eps)
 S_ML = S_AR(f, ML_phis, ML_sigma_eps)
 
 # plot the sdfs
-plt.plot(f, S_YW, label = "Yule-Walker")
-plt.plot(f, S_LS, label = "Least Squares")
-plt.plot(f, S_ML, label = "Approximate Maximum Likelihood")
+plt.plot(f, S_YW, label = "Yule-Walker", lw=1, ls='--')
+plt.plot(f, S_LS, label = "Least Squares", lw=1, ls='--')
+plt.plot(f, S_ML, label = "Approximate Maximum Likelihood", lw=1, ls='--')
 plt.xlabel("f")
 plt.ylabel("S(f)")
 plt.legend(loc = "upper left", fontsize = 5)
+plt.savefig('fig4e.eps', format='eps')
 plt.show()
+
