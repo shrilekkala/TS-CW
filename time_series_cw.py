@@ -297,7 +297,7 @@ def Least_Squares(X, p):
     phis_v = np.linalg.inv(F.T @ F) @ F.T @ X_v
     
     # find the estimate of sigma_epsilon squared
-    sigma_eps = (X_v - F @ phis_v).T @(X_v - F @ phis_v) / (N - 2*p)
+    sigma_eps = (X_v - F @ phis_v).T @ (X_v - F @ phis_v) / (N - 2*p)
 
     return phis_v, sigma_eps
 
@@ -332,22 +332,38 @@ p_mat = np.array([np.arange(1,21)]*3).T
 AIC = 2 * p_mat + N * np.log(sigma_mat)
 
 """
-"c"
+"d"
 """
 # Find the p with the lowest AIC for each method
 p_min = np.argmin(AIC, axis = 0) + 1
 
 # Find the parameter values for the chosen p for each method
-YW_phis, YW_sigma_eps = Yule_Walker(time_series, p_min[0])
+YW_phis, YW_sigma_eps = Yule_Walker(time_series, 5)
 YW_phis
 YW_sigma_eps
 
-LS_phis, LS_sigma_eps = Least_Squares(time_series, p_min[1])
+LS_phis, LS_sigma_eps = Least_Squares(time_series, x)
 LS_phis
 LS_sigma_eps
 
-ML_phis, ML_sigma_eps = Maximum_Likelihood(time_series, p_min[2])
+ML_phis, ML_sigma_eps = Maximum_Likelihood(time_series, x)
 ML_phis
 ML_sigma_eps
 
+"""
+e)
+"""
+f = np.linspace(-1/2, 1/2, 101)
+# Compute the 3 sdfs using the S_AR function
+S_YW = S_AR(f, YW_phis, YW_sigma_eps)
+S_LS = S_AR(f, LS_phis, LS_sigma_eps)
+S_ML = S_AR(f, ML_phis, ML_sigma_eps)
 
+# plot the sdfs
+plt.plot(f, S_YW, label = "Yule-Walker")
+plt.plot(f, S_LS, label = "Least Squares")
+plt.plot(f, S_ML, label = "Approximate Maximum Likelihood")
+plt.xlabel("f")
+plt.ylabel("S(f)")
+plt.legend(loc = "upper left", fontsize = 5)
+plt.show()
