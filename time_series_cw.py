@@ -317,3 +317,16 @@ def Maximum_Likelihood(X, p):
     
     return phis_v, sigma_eps
     
+"""
+"c"
+"""
+# create a 20 x 3 matrix that stores sigma_eps for each p and each method
+sigma_mat = np.zeros((20, 3))
+for p in range(20):
+    sigma_mat[p, 0] = Yule_Walker(time_series, p+1)[1]
+    sigma_mat[p, 1] = Least_Squares(time_series, p+1)[1]
+    sigma_mat[p, 2] = Maximum_Likelihood(time_series, p+1)[1]
+
+# construct a 20 x 3 matrix of AIC values for each p and each method
+p_mat = np.array([np.arange(1,21)]*3).T
+AIC = 2 * p_mat + N * np.log(sigma_mat)
