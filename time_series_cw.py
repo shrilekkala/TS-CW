@@ -301,5 +301,19 @@ def Least_Squares(X, p):
 
     return phis_v, sigma_eps
 
-        
+def Maximum_Likelihood(X, p):
+    """
+    Function that fits an AR(p) model by the approximate Maximum Likelihood method
+    given data X and number of parameters p
+    and returns the estimates for the coefficients and sigma epsilon squared
+    """
+    N = len(X)
+    
+    # obtain the least squares estimates for the vectors of phis and sigma epsilon squared
+    phis_v, LS_sigma_eps = Least_Squares(X, p)
+    
+    # create the maximum likelihood estimator of sigma_eps from the least squares one
+    sigma_eps = LS_sigma_eps * (N - 2*p) / (N - p)
+    
+    return phis_v, sigma_eps
     
