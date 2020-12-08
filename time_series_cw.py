@@ -156,12 +156,12 @@ def spectral_estimators(N):
         X = AR2_sim(phis1, 1, N)
         
         # the indices for 1/8, 2/8 and 3/8 from the fourier frequencies
-        indicies = np.arange(1,4) * (N / 8)
-        indicies = indicies.astype(int)
+        indices = np.arange(1,4) * (N / 8)
+        indices = indices.astype(int)
         
         # extract the values for frequencies 1/8, 2/8 and 3/8 and store in matrices
-        p_mat[i,:] = periodogram(X)[indicies]
-        d_mat[i,:] = direct(X)[indicies]
+        p_mat[i,:] = periodogram(X)[indices]
+        d_mat[i,:] = direct(X)[indices]
     
     # compute the absolute value of the sample bias
     p_empirical_bias = np.abs(np.mean(p_mat, axis=0) - true_s)
@@ -218,3 +218,68 @@ sdf = S_AR(frequencies, phis1, 1)
 plt.plot(frequencies, sdf)
 plt.axvline(x=1/8, color = 'r', ls = 'dotted', lw=1, label = 'f = 1/8')
 plt.show()
+
+"""
+Question 3
+"""
+time_series = np.array([0.17434,1.2875,1.6276,1.7517,2.479,1.8537,0.53564,-0.50514,-1.6363,-1.218,-2.6449,-1.013,-0.72697,0.16774,2.7097,1.7318,-0.11525,0.45508,-1.4272,-1.6926,-1.6151,-1.5088,-0.67334,0.068332,-0.74788,0.7717,0.060807,-0.92956,-0.62906,0.47694,-0.31672,1.306,0.47398,0.17882,1.7122,-0.20193,0.1694,0.20111,-1.2939,0.12961,-0.72722,-1.7166,0.635,-0.20768,-0.28336,1.8252,-0.91008,-0.14618,1.286,0.32403,0.55636,0.44725,-0.20653,0.71298,-0.22987,0.17478,-0.77277,-1.4834,-0.26414,-0.63661,0.52803,0.99871,-1.2287,-1.6065,-1.0727,-0.17734,0.34751,1.4752,1.9244,0.89304,1.6845,-0.41764,-0.22658,-0.15097,-0.89085,0.65978,0.84356,2.6663,1.9601,2.4622,1.1335,-0.27514,-0.6371,-2.4988,-2.3709,1.1849,1.0343,1.1595,2.0649,-0.75627,-1.4214,-1.3401,-2.1773,-0.88608,0.25399,0.6641,0.90835,0.51589,-0.64756,-0.72083,-1.9588,-1.6901,-1.4143,-1.2355,-0.80299,0.36638,1.8794,1.8922,0.82107,0.49564,-0.87657,-1.4168,0.086388,-1.2344,-0.031149,-0.76558,-1.0273,0.62231,0.99486,-1.6726,0.099965,1.0288,0.73741,1.951,1.0893,-0.15028,0.34172,-2.8197])
+
+"""
+"a"
+"""
+N = len(time_series)
+# obtain the estimates
+periodogram_ts = scipy.fft.fftshift(periodogram(time_series))
+direct_ts = scipy.fft.fftshift(direct(time_series))
+frequencies = np.linspace(-1/2, 1/2, N, endpoint = False)
+
+# plot the estimates
+plt.plot(frequencies, periodogram_ts)
+plt.title("Periodogram estimate of my time series")
+plt.xlabel("f")
+plt.show()
+
+plt.plot(frequencies, direct_ts)
+plt.title("Direct Spectral estimate of my time series")
+plt.xlabel("f")
+plt.show()
+
+"""
+"b"
+"""
+def Yule_Walker(X, p):
+    """
+    Function that fits an AR(p) model given data X and number of parameters p
+    and returns the estimates for the coefficients and sigma epsilon squared
+    """
+    N = len(X)
+    # create a vector estimate for the autocovariance sequence
+    s_hat = np.zeros(p+1)
+    for i in range(p):
+        s_hat[i] = np.dot(X[0: N-i], X[i: N])
+    s_hat = s_hat / N
+    
+    # create the gamma vector
+    gamma_v = s_hat[1:]
+    
+    # construct the GAMMA matrix by diagonals
+    GAMMA_M = np.zeros((p,p))
+    for j in range(p):
+        diag_index = np.arange(p-j)
+        GAMMA_M[diag_index, diag_index + j] = s_hat[j] * np.ones(p-j)
+        GAMMA_M[diag_index + j, diag_index] = s_hat[j] * np.ones(p-j)
+        
+    # find the vector estimate of the phis
+    phis_v = np.linalg.inv(GAMMA_M) @ gamma_v
+    
+    # find the estimate of sigma_epsilon squared
+    sigma_eps = s_hat[0] - np.dot(phis_v, s_hat[1:])
+        
+    return phis_v, sigma_eps
+
+
+
+
+
+        
+    
