@@ -330,3 +330,23 @@ for p in range(20):
 # construct a 20 x 3 matrix of AIC values for each p and each method
 p_mat = np.array([np.arange(1,21)]*3).T
 AIC = 2 * p_mat + N * np.log(sigma_mat)
+
+"""
+"c"
+"""
+# Find the p with the lowest AIC for each method
+p_min = np.argmin(AIC, axis = 0) + 1
+
+# Find the parameter values for the chosen p for each method
+YW_phis, YW_sigma_eps = Yule_Walker(time_series, p_min[0])
+YW_phis
+YW_sigma_eps
+
+LS_phis, LS_sigma_eps = Least_Squares(time_series, p_min[1])
+LS_phis
+LS_sigma_eps
+
+ML_phis, ML_sigma_eps = Maximum_Likelihood(time_series, p_min[2])
+ML_phis
+ML_sigma_eps
+
