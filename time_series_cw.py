@@ -3,13 +3,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy
-import time
 
 """
 Question 1
 """
 "a"
-
 
 def S_AR(f, phis, sigma2):
     
@@ -19,15 +17,16 @@ def S_AR(f, phis, sigma2):
     # initialise S
     S = f.copy()
 
-    
     # create vectors phis1 = ([1, -phi_1p, -phi_2p, .., -phi_pp])
     phis1 = np.ones(p + 1)
     phis1[1:] = - phis
     
+
     for i in range(len(f)):
         # generate the vector (1, e^(-i*2*pi*f), ..., -^(-i*2*pi*f*p))
-        v1 = np.ones(p+1, dtype = 'complex') * np.exp(-1j * 2 * np.pi * f[i] * np.arange(p+1))
+        v1 = np.ones(p+1) * np.exp(-1j * 2 * np.pi * f[i] * np.arange(p+1))
         
+        # calculate the sdf for the specific frequency
         S[i] = sigma2 / (np.abs(phis1.T @ v1) ** 2)
     
     return S
@@ -42,14 +41,14 @@ def AR2_sim(phis, sigma2, N):
     X[0] = 0
     X[1] = 0
     
-    # create vector of epsilons via Multivariate Normal Distribution
+    # create vector of epsilons via the normal distribution
     eps = np.random.normal(0, np.sqrt(sigma2), 100+N)
     
     # iteratively find the values of the time series
     for i in range(2, 100+N):
         X[i] = phis[0] * X[i-1] + phis[1] * X[i-2] + eps[i]
     
-    # return the vector X C with the 1st 100 values discarded
+    # return the vector X with the 1st 100 values discarded
     return X[100:]
 
 # plotting an example sim for AR(2)
@@ -139,8 +138,10 @@ p_sample_mean = np.mean(p_mat, axis=0)
 d_sample_mean = np.mean(d_mat, axis=0)
 
 # compute the absolute value of the sample bias
-p_empirical_bias = np.abs(p_sample_mean - true_s)
-d_empirical_bias = np.abs(d_sample_mean - true_s)
+p_empirical_bias1 = np.abs(p_sample_mean - true_s)
+print(p_empirical_bias1)
+d_empirical_bias1 = np.abs(d_sample_mean - true_s)
+print(d_empirical_bias1)
 
 "b (C)"
 # store the parameters for the AR2
@@ -155,11 +156,11 @@ def spectral_estimators(N):
     for i in range(10000):
         X = AR2_sim(phis1, 1, N)
         
-        # the indices for 1/8, 2/8 and 3/8 from the fourier frequencies
+        # the indices for getting 1/8, 2/8 and 3/8 from the fourier frequencies
         indices = np.arange(1,4) * (N / 8)
         indices = indices.astype(int)
         
-        # extract the values for frequencies 1/8, 2/8 and 3/8 and store in matrices
+        # extract the values for frequencies 1/8, 2/8 and 3/8 and store them
         p_mat[i,:] = periodogram(X)[indices]
         d_mat[i,:] = direct(X)[indices]
     
@@ -172,54 +173,65 @@ def spectral_estimators(N):
 # generate N values of powers of 2 from 16 to 4096
 N_vals = 2 ** np.arange(4,13)
 
-# create a 9 x 6 matrix to store the empirical bias for different frequencies and different estimators
+# create a 9 x 6 matrix to store the empirical biases
 bias_matrix = np.zeros((9,6))
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""
-start = time.time()
 
 for i in range(len(N_vals)):
     ### just for output ###
     print(i)
+    # compute the biases for a particular N
     p_bias, d_bias = spectral_estimators(N_vals[i])
     bias_matrix[i, 0:3] = p_bias
     bias_matrix[i, 3:6] = d_bias
 
-end = time.time()
-print("time taken: ", end - start)
 
 "b (D)"
 # plot comparison for f = 1/8
-plt.title('f = 1/8')
+plt.title('Empirical bias against N, f = 1/8')
 plt.plot(N_vals, bias_matrix[:,0], marker = '.', label = 'periodogram')
 plt.plot(N_vals, bias_matrix[:,3], marker = '.', color = 'red', label = 'direct')
 plt.xscale('log', basex = 2)
+plt.xlabel('N')
+plt.ylabel('Empirical Bias')
 plt.legend()
+### plt.savefig('fig2bd1.eps', format='eps')
 plt.show()
 
+
 # plot comparison for f = 2/8
-plt.title('f = 2/8')
+plt.title('Empirical bias against N, f = 2/8')
 plt.plot(N_vals, bias_matrix[:,1], marker = '.', label = 'periodogram')
 plt.plot(N_vals, bias_matrix[:,4], marker = '.', color = 'red', label = 'direct')
 plt.xscale('log', basex = 2)
+plt.xlabel('N')
+plt.ylabel('Empirical Bias')
 plt.legend()
+### plt.savefig('fig2bd2.eps', format='eps')
 plt.show()
 
 # plot comparison for f = 3/8
-plt.title('f = 3/8')
+plt.title('Empirical bias against N, f = 3/8')
 plt.plot(N_vals, bias_matrix[:,2], marker = '.', label = 'periodogram')
 plt.plot(N_vals, bias_matrix[:,5], marker = '.', color = 'red', label = 'direct')
 plt.xscale('log', basex = 2)
+plt.xlabel('N')
+plt.ylabel('Empirical Bias')
 plt.legend()
+### plt.savefig('fig2bd3.eps', format='eps')
 plt.show()
 
-# plot true S (S(f) against f)
+"c"
+# plot true sdf using the S_AR function from earlier
+plt.title('True spectral density function')
+plt.xlabel('f')
+plt.ylabel('S(f)')
 frequencies = np.linspace(0, 1/2, 101)
 sdf = S_AR(frequencies, phis1, 1)
-plt.plot(frequencies, sdf)
+plt.plot(frequencies, sdf, label = 'S(f)')
 plt.axvline(x=1/8, color = 'r', ls = 'dotted', lw=1, label = 'f = 1/8')
+plt.legend()
+### plt.savefig('fig2c.eps', format='eps')
 plt.show()
-"""""""""""""""""""""""""""""""""""""""""""""""""""""
 """
 Question 3
 """
@@ -238,11 +250,15 @@ frequencies = np.linspace(-1/2, 1/2, N, endpoint = False)
 plt.plot(frequencies, periodogram_ts)
 plt.title("Periodogram estimate of my time series")
 plt.xlabel("f")
+plt.ylabel("Estimate of S(f)")
+### plt.savefig('fig3a1.eps', format='eps')
 plt.show()
 
 plt.plot(frequencies, direct_ts)
 plt.title("Direct Spectral estimate of my time series")
 plt.xlabel("f")
+plt.ylabel("Estimate of S(f)")
+### plt.savefig('fig3a2.eps', format='eps')
 plt.show()
 
 """
@@ -304,16 +320,16 @@ def Least_Squares(X, p):
 
 def Maximum_Likelihood(X, p):
     """
-    Function that fits an AR(p) model by the approximate Maximum Likelihood method
+    Function that fits an AR(p) model by the Maximum Likelihood method
     given data X and number of parameters p
     and returns the estimates for the coefficients and sigma epsilon squared
     """
     N = len(X)
     
-    # obtain the least squares estimates for the vectors of phis and sigma epsilon squared
+    # obtain the estimates from the least squares method
     phis_v, LS_sigma_eps = Least_Squares(X, p)
     
-    # create the maximum likelihood estimator of sigma_eps from the least squares one
+    # scale the estimator of sigma_epsilon squared appropriately
     sigma_eps = LS_sigma_eps * (N - 2*p) / (N - p)
     
     return phis_v, sigma_eps
@@ -354,19 +370,22 @@ ML_sigma_eps
 """
 e)
 """
+# Create a vector of frequencies to compute the spectral densities
 f = np.linspace(-1/2, 1/2, 101)
+
 # Compute the 3 sdfs using the S_AR function
 S_YW = S_AR(f, YW_phis, YW_sigma_eps)
 S_LS = S_AR(f, LS_phis, LS_sigma_eps)
 S_ML = S_AR(f, ML_phis, ML_sigma_eps)
 
 # plot the sdfs
+plt.title("The spectral density function for each chosen model")
 plt.plot(f, S_YW, label = "Yule-Walker", lw=1, ls='--')
 plt.plot(f, S_LS, label = "Least Squares", lw=1, ls='--')
 plt.plot(f, S_ML, label = "Approximate Maximum Likelihood", lw=1, ls='--')
 plt.xlabel("f")
 plt.ylabel("S(f)")
 plt.legend(loc = "upper left", fontsize = 5)
-plt.savefig('fig4e.eps', format='eps')
+### plt.savefig('fig3e.eps', format='eps')
 plt.show()
 
