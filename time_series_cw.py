@@ -389,3 +389,56 @@ plt.legend(loc = "upper left", fontsize = 5)
 ### plt.savefig('fig3e.eps', format='eps')
 plt.show()
 
+"""
+Question 4
+"""
+def forecast_AR(phis):
+    """
+    Function that fits forecasts points 119 to 128 of my time series
+    given parameter estimates for the phis and returns the forecasts.
+    """
+    # Determine number of phi paramemters
+    p = len(phis)
+    
+    # Create a vector to store the forecasts
+    forecasts = np.zeros(10)
+    
+    # Store the last p values of my time series up to point 118
+    indices = - np.arange(p) + 117
+    previous_p_vals = time_series[indices]
+    
+    # iteratively calculate forecast of the next 10 points 
+    for i in range(10):
+        forecasts[i] = np.dot(phis, previous_p_vals)
+        
+        # update the vector of the previous p values
+        previous_p_vals = np.roll(previous_p_vals, 1)
+        previous_p_vals[0] = forecasts[i]
+    
+    return forecasts
+
+# Find the forecasts for each of the selected models and parameter estimates
+YW_forecast = forecast_AR(YW_phis)
+LS_forecast = forecast_AR(LS_phis)
+ML_forecast = forecast_AR(ML_phis)
+true_vals = time_series[109:]
+
+# plot the true values and the forecasts
+plt.title("Forecasts for each chosen model")
+plt.plot(np.arange(110, 129), true_vals, label = "true")
+plt.plot(np.arange(119, 129), YW_forecast, label = "YW forecast", ls='--')
+plt.plot(np.arange(119, 129), LS_forecast, label = "LS forecast", ls='--')
+plt.plot(np.arange(119, 129), ML_forecast, label = "ML forecast", ls='--')
+plt.xlabel("t")
+plt.ylabel("X_t")
+plt.xticks(np.arange(110, 129, 2))
+plt.legend(loc = "upper left", fontsize = 8)
+### plt.savefig('fig3e.eps', format='eps')
+plt.show()
+
+
+
+
+
+
+
